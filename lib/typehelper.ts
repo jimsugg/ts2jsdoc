@@ -73,6 +73,52 @@ function getGenericPart(node: utils.NodeWithType, typeNode: ts.TypeNode, checker
     }
 }
 
+function isIntrinsicType(type: ts.Type) {
+    if (utils.hasFlag(type.flags, ts.TypeFlags.TypeParameter)) {
+        return true;
+    }
+    if (utils.hasFlag(ts.TypeFlags.Object, type.flags)) {
+        // let objectFlags = (<ts.ObjectType>type).objectFlags;
+        // if (!utils.hasFlag(ts.ObjectFlags.Anonymous, objectFlags)) {
+            return true;
+        }
+//    }
+    return false;
+}
+
+// TODO: check this
+export function getTypeNodeTypeName(typeNode: ts.TypeNode, checker: ts.TypeChecker, givenType?: ts.Type): NodeTypeNameResult {
+    if (typeNode.getText().indexOf("typeof") === 0) {
+        return getLinkedResult(typeNode);
+    }
+
+    var type = typeNode ? checker.getTypeAtLocation(typeNode) : givenType,
+        symbol = type.symbol,
+        tmp: NodeTypeNameResult,
+        result: NodeTypeNameResult;
+
+    if (isIntrinsicType(type)) {
+        return getIntrinsicResult(type, checker);
+    }
+
+    result = {
+        name: symbol ?
+            checker.getFullyQualifiedName(symbol).replace(/"/g, "") :
+            checker.typeToString(type),
+        anonymous: []
+    };
+
+    //TODO: handle generics
+    // tmp = getGenericPart(node, typeNode, checker);
+    // if (tmp) {
+    //     result.name += tmp.name;
+    //     result.anonymous = tmp.anonymous;
+    // }
+
+    result.name = utils.formatType(result.name);
+    return result;
+}
+
 export function getNodeTypeName(node: utils.NodeWithType, typeNode: ts.TypeNode, checker: ts.TypeChecker, givenType?: ts.Type): NodeTypeNameResult {
     if (typeNode.getText().indexOf("typeof") === 0) {
         return getLinkedResult(typeNode);
@@ -83,8 +129,7 @@ export function getNodeTypeName(node: utils.NodeWithType, typeNode: ts.TypeNode,
         tmp: NodeTypeNameResult,
         result: NodeTypeNameResult;
 
-    if (utils.hasFlag(ts.TypeFlags.Intrinsic, type.flags) ||
-        utils.hasFlag(type.flags, ts.TypeFlags.TypeParameter)) {
+    if (isIntrinsicType(type)) {
         return getIntrinsicResult(type, checker);
     }
 
@@ -92,9 +137,9 @@ export function getNodeTypeName(node: utils.NodeWithType, typeNode: ts.TypeNode,
         typeNode = (<ts.VariableDeclaration>symbol.valueDeclaration).type;
     }
 
-    if (utils.hasFlag(type.flags, ts.TypeFlags.Anonymous)) {
-        return getAnonymousResult(node, typeNode, checker);
-    }
+    // if (isAnonymousType(type)) {
+    //     return getAnonymousResult(node, typeNode, checker);
+    // }
     if (utils.hasFlag(type.flags, ts.TypeFlags.Union) && (<ts.UnionTypeNode>typeNode).types) {
         return getUnionTypeResult(node, <ts.UnionTypeNode>typeNode, checker);
     }

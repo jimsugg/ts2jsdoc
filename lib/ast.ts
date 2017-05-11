@@ -72,13 +72,13 @@ export function getFileComments(filename: string, options?: ts.CompilerOptions):
     filename = filename.replace(/\\/g, "/");
 
     options = options || {
-        target: ts.ScriptTarget.ES6,
+        target: ts.ScriptTarget.ES2015,
         module: ts.ModuleKind.CommonJS
     };
 
     var host = ts.createCompilerHost(options),
         program = ts.createProgram([filename], options, host),
-        checker = program.getTypeChecker(true),
+        checker = program.getTypeChecker(),
 
         file = program.getSourceFile(filename);
 
@@ -86,14 +86,14 @@ export function getFileComments(filename: string, options?: ts.CompilerOptions):
 }
 
 export function compile(program: ts.Program, commandLine: ts.ParsedCommandLine, checker: ts.TypeChecker): void {
-    commandLine.filenames.forEach(filename => {
+    commandLine.fileNames.forEach(filename => {
         var options = commandLine.options,
             sourceFile = program.getSourceFile(filename),
             comments = createComments(sourceFile, checker),
-            newFileName = sourceFile.filename.replace(/(\.d)?\.ts$/, ".jsdoc");
+            newFileName = sourceFile.fileName.replace(/(\.d)?\.ts$/, ".jsdoc");
 
         if (options.outDir) {
-            newFileName = newFileName.replace(path.dirname(sourceFile.filename), options.outDir);
+            newFileName = newFileName.replace(path.dirname(sourceFile.fileName), options.outDir);
         }
         else if (options.out) {
             newFileName = options.out;

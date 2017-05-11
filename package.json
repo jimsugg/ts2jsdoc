@@ -1,6 +1,6 @@
 {
   "name": "ts2jsdoc",
-  "version": "0.1.2",
+  "version": "0.2.1",
   "description": "A JSDoc plugin with an optional template which automatically adds JSDoc comments based on Typescript definitions.",
   "license": "MIT",
   "main": "lib/ast.js",
@@ -11,6 +11,9 @@
     "name": "SPATools",
     "email": "spa@touchify.co"
   },
+  "contributors": [
+    { "name": "Jim Sugg", "email": "jims@suggarts.com" }
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/spatools/ts2jsdoc"
@@ -20,9 +23,10 @@
     "lib": "lib"
   },
   "peerDependencies": {
-    "typescript": "~1.4.0"
+    "typescript": "~2.3.0"
   },
   "devDependencies": {
+    "@types/node": "^7.0.18",
     "grunt": "^0.4.5",
     "grunt-contrib-clean": "^0.6.0",
     "grunt-contrib-connect": "^0.10.1",
@@ -31,8 +35,8 @@
     "grunt-gh-pages": "^0.10.0",
     "grunt-jsdoc": "^0.6.3",
     "grunt-markdown": "^0.7.0",
+    "grunt-ts": "^6.0.0-beta.15",
     "grunt-tslint": "^2.2.0-beta",
-    "grunt-typescript": "^0.6.1",
     "jit-grunt": "^0.9.1",
     "time-grunt": "^1.2.0",
     "tslint": "^2.2.0-beta"

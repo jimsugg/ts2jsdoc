@@ -8,9 +8,11 @@
 *.sln
 *.*proj
 .vs/
+.idea/
 
 # Build results
 .grunt/
+.tscache/
 [Dd]ebug/
 [Rr]elease/
 x64/

@@ -18,9 +18,11 @@ typings/
 Gruntfile.js
 tslint.json
 .travis.yml
+.idea/
 
 # Build results
 .grunt/
+.tscache/
 build/
 [Dd]ebug/
 [Rr]elease/

@@ -6,7 +6,7 @@ import jsdoc = require("./jsdoc");
 //#region Private Method
 
 function addTypeToTag(comments: jsdoc.Comments, tag: jsdoc.Tag, node: utils.NodeWithType, checker: ts.TypeChecker, type?: ts.Type) {
-    var nodeType = <ts.TypeNode>node.type;
+    var nodeType = node ? <ts.TypeNode>node.type : undefined;
     if (!nodeType && !type) {
         tag.type = "*";
         return;
@@ -91,7 +91,7 @@ export function addName(comments: jsdoc.Comments, tagName: string, node: utils.N
         }
 
         if (initializer && !nodeType) {
-            addTypeToTag(comments, tag, null, checker, initializer.contextualType);
+            addTypeToTag(comments, tag, null, checker, checker.getContextualType(initializer));
         }
     }
 }
@@ -134,18 +134,19 @@ export function addParentModule(comments: jsdoc.Comments, node: ts.Node, checker
 export function addModifier(comments: jsdoc.Comments, node: ts.Node): void {
     var isInterface = node.parent && node.parent.kind === ts.SyntaxKind.InterfaceDeclaration;
 
-    if (!isInterface && node.modifiers) {
-        if ((node.modifiers.flags & ts.NodeFlags.Public) === ts.NodeFlags.Public) {
+    var modifierFlags = ts.getCombinedModifierFlags(node);
+    if (!isInterface && modifierFlags) {
+        if ((modifierFlags & ts.ModifierFlags.Public) === ts.ModifierFlags.Public) {
             comments.getOrAddTag("public");
         }
-        else if ((node.modifiers.flags & ts.NodeFlags.Private) === ts.NodeFlags.Private) {
+        else if ((modifierFlags & ts.ModifierFlags.Private) === ts.ModifierFlags.Private) {
             comments.getOrAddTag("private");
         }
-        else if ((node.modifiers.flags & ts.NodeFlags.Protected) === ts.NodeFlags.Protected) {
+        else if ((modifierFlags & ts.ModifierFlags.Protected) === ts.ModifierFlags.Protected) {
             comments.getOrAddTag("protected");
         }
 
-        if ((node.modifiers.flags & ts.NodeFlags.Static) === ts.NodeFlags.Static) {
+        if ((modifierFlags & ts.ModifierFlags.Static) === ts.ModifierFlags.Static) {
             comments.getOrAddTag("static");
         }
     }
@@ -238,7 +239,7 @@ export function addImplementations(comments: jsdoc.Comments, node: utils.ClassOr
         var tagName = clause.token === ts.SyntaxKind.ExtendsKeyword ? "augments" : "implements";
 
         clause.types.forEach(clauseType => {
-            var typeResult = typehelper.getNodeTypeName(node, clauseType, checker);
+            var typeResult = typehelper.getTypeNodeTypeName(clauseType, checker);
             comments.getOrAddTag(tagName, typeResult.name);
         });
     });
@@ -287,7 +288,7 @@ export function addEnumMembers(comments: jsdoc.Comments, node: ts.EnumDeclaratio
     });
 }
 
-export function addTypeDefProperty(comments: jsdoc.Comments, tagName: string, node: ts.VariableDeclaration, checker: ts.TypeChecker): void {
+export function addTypeDefProperty(comments: jsdoc.Comments, tagName: string, node: ts.VariableDeclaration | ts.PropertyDeclaration, checker: ts.TypeChecker): void {
     var name = utils.getNodeName(node),
         tag = comments.getOrAddTag(tagName, name),
         nodeType = node.type;

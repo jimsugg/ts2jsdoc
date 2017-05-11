@@ -25,7 +25,7 @@ module.exports = function (grunt) {
             temp: "temp"
         },
         
-        typescript: {
+        ts: {
             options: {
                 target: "es5",
                 module: "commonjs",
@@ -37,7 +37,7 @@ module.exports = function (grunt) {
                 src: ["<%= paths.defs %>", "<%= paths.all %>/**/*.ts", "./*.ts"]
             },
             dist: {
-                src: ["<%= typescript.src.src %>"],
+                src: ["<%= ts.src.src %>"],
                 options: {
                     sourceMap: false
                 }
@@ -46,17 +46,17 @@ module.exports = function (grunt) {
         
         jsdoc : {
             typescript : {
-                src: ["node_modules/typescript/bin/typescriptServices.d.ts"],
+                src: ["node_modules/typescript/lib/typescriptServices.d.ts"],
                 dest: "<%= paths.dist %>/typescript",
                 options: { configure: "<%= paths.build %>/conf.typescript.json" }
             },
             lib : {
-                src: ["node_modules/typescript/bin/lib.d.ts"],
+                src: ["node_modules/typescript/lib/lib.d.ts"],
                 dest: "<%= paths.dist %>/lib",
                 options: { configure: "<%= paths.build %>/conf.lib.json" }
             },
             node : {
-                src: ["typings/node/node.d.ts"],
+                src: ["node_modules/@types/node/node.d.ts"],
                 dest: "<%= paths.dist %>/node",
                 options: { configure: "<%= paths.build %>/conf.node.json" }
             }
@@ -137,8 +137,8 @@ module.exports = function (grunt) {
 
     });
     
-    grunt.registerTask("dev", ["tslint:src", "clean:src", "typescript:src"]);
-    grunt.registerTask("build", ["tslint:src", "clean:src", "typescript:dist"]);
+    grunt.registerTask("dev", ["tslint:src", "clean:src", "ts:src"]);
+    grunt.registerTask("build", ["tslint:src", "clean:src", "ts:dist"]);
 
     grunt.registerTask("doc", ["clean:dist", "jsdoc:typescript", "jsdoc:node"]);
     grunt.registerTask("site", ["copy:site", "markdown:site"]);

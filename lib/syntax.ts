@@ -4,6 +4,16 @@ import common = require("./common");
 import utils = require("./utils");
 
 export function forVar(list: jsdoc.CommentsList, node: ts.VariableDeclaration, checker: ts.TypeChecker): void {
+    var comments: jsdoc.Comments;
+
+    comments = list.addFromNode(node);
+    common.addName(comments, "member", node, checker);
+    common.addDefault(comments, node);
+    common.addParent(comments, node, checker);
+    common.addModifier(comments, node);
+}
+
+export function forProperty(list: jsdoc.CommentsList, node: ts.PropertyDeclaration, checker: ts.TypeChecker): void {
     var parent = node.parent,
         comments: jsdoc.Comments;
 

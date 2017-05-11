@@ -6,8 +6,8 @@ function getKindsToProcess(): ts.SyntaxKind[] {
     var self = <any>getKindsToProcess;
     if (!self.result) {
         self.result = [
-            ts.SyntaxKind.Property,
-            ts.SyntaxKind.Method,
+            ts.SyntaxKind.PropertyDeclaration,
+            ts.SyntaxKind.MethodDeclaration,
             ts.SyntaxKind.Constructor,
             ts.SyntaxKind.GetAccessor,
             ts.SyntaxKind.SetAccessor,
@@ -40,11 +40,14 @@ export function process(comments: jsdoc.CommentsList, node: ts.Node, checker: ts
 
     switch (node.kind) {
         case ts.SyntaxKind.VariableDeclaration:
-        case ts.SyntaxKind.Property:
             syntax.forVar(comments, <ts.VariableDeclaration>node, checker);
             break;
 
-        case ts.SyntaxKind.Method:
+        case ts.SyntaxKind.PropertyDeclaration:
+            syntax.forProperty(comments, <ts.PropertyDeclaration>node, checker);
+            break;
+
+        case ts.SyntaxKind.MethodDeclaration:
         case ts.SyntaxKind.FunctionDeclaration:
             syntax.forFunction(comments, <ts.FunctionDeclaration>node, checker);
             break;

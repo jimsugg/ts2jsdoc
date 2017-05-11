@@ -6,10 +6,10 @@ var isExternalRegexp = /"[^"]+"/,
     fixGenericsArrays = /([^<]+)\.<(.+)>\[\]$/g;
 
 export type ClassOrInterfaceDeclaration = ts.ClassDeclaration | ts.InterfaceDeclaration;
-export type NodeWithName = ts.VariableDeclaration | ts.FunctionDeclaration | ts.EnumMember | ClassOrInterfaceDeclaration | ts.ModuleDeclaration;
-export type NodeWithType = ts.VariableDeclaration | ts.SignatureDeclaration | ts.PropertyDeclaration | ts.ParameterDeclaration;
+export type NodeWithName = ts.VariableDeclaration | ts.PropertyDeclaration | ts.FunctionDeclaration | ts.EnumDeclaration | ts.TypeAliasDeclaration | ClassOrInterfaceDeclaration | ts.ModuleDeclaration;
+export type NodeWithType = ts.VariableDeclaration | ts.PropertyDeclaration | ts.SignatureDeclaration | ts.PropertyDeclaration | ts.ParameterDeclaration;
 export type NodeWithTypeParameters = ClassOrInterfaceDeclaration | ts.SignatureDeclaration;
-export type NodeWithInitializer = ts.VariableDeclaration | ts.ParameterDeclaration | ts.EnumMember;
+export type NodeWithInitializer = ts.VariableDeclaration | ts.PropertyDeclaration | ts.ParameterDeclaration | ts.EnumMember;
 
 export function getNodeName(node: ts.Node): string {
     var decla = (<ts.Declaration>node);
@@ -44,7 +44,7 @@ export function getParentModuleName(node: ts.Node, checker: ts.TypeChecker): str
         return (isExternal(<ts.ModuleDeclaration>node.parent) ? "module:" : "") + typeName;
     }
     else { //(node.parent.kind === ts.SyntaxKind.SourceFile)
-        var mod = (<ts.SourceFile>node).amdModuleName;
+        var mod = (<ts.SourceFile>node).moduleName;
         if (mod) {
             return "module:" + mod;
         }
@@ -87,10 +87,10 @@ export function getParentName(node: ts.Node, checker: ts.TypeChecker): string {
         return getAnonymousFullName(<NodeWithType>node.parent, checker);
     }
     else { //(node.parent.kind === ts.SyntaxKind.SourceFile)
-        return (<ts.SourceFile>node).amdModuleName;
+        return (<ts.SourceFile>node).moduleName;
     }
 
-    return null;
+    //return null;
 }
 export function getAnonymousName(node: ts.Node): string {
     var oldNode = node,
@@ -100,11 +100,11 @@ export function getAnonymousName(node: ts.Node): string {
 
     var kinds = [
         ts.SyntaxKind.VariableDeclaration,
-        ts.SyntaxKind.Property,
+        ts.SyntaxKind.PropertyDeclaration,
         ts.SyntaxKind.CallSignature,
         ts.SyntaxKind.ConstructSignature,
         ts.SyntaxKind.FunctionDeclaration,
-        ts.SyntaxKind.Method,
+        ts.SyntaxKind.MethodDeclaration,
         ts.SyntaxKind.Parameter
     ];
 
@@ -114,7 +114,7 @@ export function getAnonymousName(node: ts.Node): string {
 
         if (!node) {
             var msg =
-                "Unknow scenario during anonymous name construction.\n" +
+                "Unknown scenario during anonymous name construction.\n" +
                 "Node kind:\t" + getSyntaxKindString(oldNode) + "\n" +
                 "Node text:\t" + oldNode.getText();
 
@@ -124,7 +124,7 @@ export function getAnonymousName(node: ts.Node): string {
         }
     }
 
-    if (node.kind === ts.SyntaxKind.FunctionDeclaration || node.kind === ts.SyntaxKind.Method ||
+    if (node.kind === ts.SyntaxKind.FunctionDeclaration || node.kind === ts.SyntaxKind.MethodDeclaration ||
         node.kind === ts.SyntaxKind.ConstructSignature || node.kind === ts.SyntaxKind.CallSignature) {
         tagName = "Returns";
     }
